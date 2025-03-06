@@ -1,0 +1,2 @@
+# HolyGrailRatings
+AFL Model
