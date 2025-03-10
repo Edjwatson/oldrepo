@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-900">
-    <header class="bg-gray-800 text-white text-center p-4 text-2xl font-bold">
+    <header class="bg-gray-800 text-white p-4 text-2xl font-bold text-left">
         Holy Grail Ratings
     </header>
     
@@ -41,8 +41,35 @@
         
         <section class="mt-6">
             <h2 class="text-xl font-bold">Posts</h2>
-            <p class="text-gray-700">Latest blog posts will be displayed here.</p>
+            <div id="posts-container" class="text-gray-700">Loading posts...</div>
         </section>
     </main>
+
+    <script>
+        async function loadPosts() {
+            const postsContainer = document.getElementById("posts-container");
+            postsContainer.innerHTML = "";
+            
+            const postFiles = ["post1.txt", "post2.txt"]; // Add filenames here
+            
+            for (const file of postFiles) {
+                try {
+                    const response = await fetch(`posts/${file}`);
+                    if (!response.ok) throw new Error("File not found");
+                    const text = await response.text();
+                    
+                    const postElement = document.createElement("div");
+                    postElement.className = "bg-white p-4 my-2 border border-gray-300 rounded";
+                    postElement.textContent = text;
+                    
+                    postsContainer.appendChild(postElement);
+                } catch (error) {
+                    console.error("Error loading post:", file, error);
+                }
+            }
+        }
+
+        loadPosts();
+    </script>
 </body>
 </html>
