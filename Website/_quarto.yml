@@ -1,0 +1,21 @@
+resources:
+  - /Users/edwardwatson/Documents/AFL Model/Website/assets/HGR.png
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Holy Grail Ratings"
+  favicon: assets/HGR2.png
+  page-footer: 
+    center: 
+      - text: "Edward Watson 2025"
+
+format:
+  html:
+    include-in-header: assets/partials/_navbar.html
+    theme: styles.scss
+    css: styles.scss
+    toc: true
+    page-layout: full
+    mainfont: Editorial New Regular

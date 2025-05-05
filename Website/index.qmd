@@ -1,0 +1,332 @@
+---
+format: html
+execute:
+    echo: false
+    code-tools: true
+engine: jupyter
+jupyter: python3
+page-layout: custom
+resources: assets/clubicons
+---
+
+```{python}
+from reactable import Reactable, Theme, options, embed_css, Column, CellInfo
+from reactable.tags import to_widget
+from IPython.display import display, HTML
+import htmltools
+from htmltools import tags
+import pandas as pd
+from mizani.palettes import gradient_n_pal
+import numpy as np
+
+blog_post_path = 'posts/Test/Test'  # Path to your specific blog post file
+blog_post_name = 'Test'  # Set the title you want for the blog post card
+blog_post_url = f"{blog_post_path.replace(' ', '-')}.html"  # You might need to adjust the URL structure
+
+# Read snippet from blog post
+with open("posts/test/test.qmd", "r", encoding="utf-8") as f:
+    lines = f.readlines()
+
+# Read snippet from blog post
+with open("posts/test/test.qmd", "r", encoding="utf-8") as f:
+    lines = f.readlines()
+
+# Skip YAML front matter, blank lines, and image lines
+content_lines = []
+in_yaml = False
+for line in lines:
+    stripped = line.strip()
+    if stripped == "---":
+        in_yaml = not in_yaml
+        continue
+    if in_yaml or not stripped:
+        continue
+    if stripped.startswith("![]") or stripped.startswith("!["):
+        continue
+    content_lines.append(stripped)
+    if len(content_lines) >= 5:
+        break
+
+snippet = " ".join(content_lines)
+
+
+
+# Theme and CSS
+options.theme = Theme(
+    header_style="hsl(233, 9%, 19%) !important",
+    border_color="hsl(233, 9%, 22%) !important",
+    highlight_color="hsl(233, 9%, 87%)",
+    select_style={"background-color": "hsl(233, 9%, 25%)"},
+)
+embed_css()
+
+# Abbreviations
+team_abbreviations = {
+    'Adelaide': 'ADE', 'Brisbane Lions': 'BRI', 'Carlton': 'CAR', 'Collingwood': 'COL',
+    'Essendon': 'ESS', 'Fremantle': 'FRE', 'Geelong': 'GEE', 'Gold Coast': 'GC',
+    'Greater Western Sydney': 'GWS', 'Hawthorn': 'HAW', 'Melbourne': 'MEL',
+    'North Melbourne': 'NM', 'Port Adelaide': 'PORT', 'Richmond': 'RIC',
+    'St Kilda': 'STK', 'Sydney': 'SYD', 'West Coast': 'WCE', 'Western Bulldogs': 'WB'
+}
+
+# Predictions data
+predictions = pd.read_csv('data/predictions.csv')
+
+def fmt_image(ci: CellInfo):
+    team = ci.value
+    row = predictions[
+        (predictions['Home'] == team) | (predictions['Away'] == team)
+    ].iloc[0]
+    is_winner = (
+        (row['Home'] == team and row['Margin'] > 0) or
+        (row['Away'] == team and row['Margin'] < 0)
+    )
+    abbreviated_team = team_abbreviations.get(team, team)
+    
+    image = htmltools.img(
+        src=f"assets/clubicons/{team}-40.png",
+        style="height: 24px; vertical-align: middle;",
+        alt=abbreviated_team,
+    )
+
+    # Always apply span shift to the text
+    text_span = htmltools.span(
+        abbreviated_team,
+        style="position: relative; top: 2px;"
+    )
+
+    # Apply bubble style conditionally
+    if is_winner:
+        name_div = htmltools.div(
+            text_span,
+            style=(
+                "display: inline-block; margin-left: 6px; padding: 2px 6px; "
+                "border-radius: 6px; line-height: 1.2; vertical-align: middle; "
+                "background-color: #e8f3c3;"
+            )
+        )
+    else:
+        name_div = htmltools.div(
+            text_span,
+            style=(
+                "display: inline-block; margin-left: 6px; line-height: 1.2;"
+            )
+        )
+
+    return htmltools.TagList(
+        htmltools.div(
+            [image, name_div],
+            style="display: flex; align-items: center; gap: 4px;"
+        )
+    )
+
+pred_table = Reactable(
+    predictions[['Home', 'Away', 'Venue', 'Margin', 'Prob']],
+    columns={
+        "Home": Column(cell=fmt_image, style={"font-weight": "bold"},header_style={"text-align": "center"}),
+        "Away": Column(cell=fmt_image, style={"font-weight": "bold", "border-right": "1px solid #eee"},header_style={"text-align": "center"}),
+        "Margin": Column(
+            name="Margin",
+            cell=lambda ci: f"{int(np.ceil(ci.value)) if ci.value < 0 else int(np.floor(ci.value))}"  # Custom rounding logic and remove decimal
+        , style ={"text-align": "center"},header_style= {"text-align": "center"}),
+        "Prob": Column(name="Probability",
+            cell=lambda ci: f"{ ci.value * 100:.0f}%",style ={"text-align": "center"}, header_style={"text-align": "center"})
+    },
+    wrap=False,
+    highlight=True,
+    class_="prediction-tbl"
+)
+
+# Ratings table
+ladder = pd.read_csv('data/ratings.csv')
+ladder = ladder[['team', 'combined', 'orating', 'drating']].round(1)
+pal = gradient_n_pal(['#ffd864','#ffffff', '#66a558'])
+
+def fmt_image_team(ci: CellInfo):
+    team = ci.value
+    abbreviated_team = team_abbreviations.get(team, team)
+    return htmltools.TagList(
+        htmltools.div([
+            htmltools.img(src=f"assets/clubicons/{team}-40.png",
+                          style="height: 24px; vertical-align: middle;",
+                          alt=team),
+            htmltools.div(abbreviated_team)
+        ], style="display: flex; align-items: center; gap: 4px;")
+    )
+
+def fmt_fill(ci: CellInfo):
+    if not isinstance(ci.value, float): return {}
+    val_range = max(ladder[ci.column_name]) - min(ladder[ci.column_name])
+    normalized = (ci.value - min(ladder[ci.column_name])) / val_range
+    return {"background": pal(normalized)}
+
+rating_table = Reactable(
+    ladder,
+    default_sorted=['combined'],
+    default_sort_order="desc",
+    default_col_def=Column(style=fmt_fill),
+    columns={
+        "team": Column(name="Team", cell=fmt_image_team,style={"font-weight": "bold"}),
+        "combined": Column(name="Rating"),
+        "orating": Column(name="Offence"),
+        "drating": Column(name="Defence"),
+    },
+    pagination=False,
+    bordered=False,
+    class_='ladder-tbl'
+)
+
+# Output widget
+to_widget(
+    tags.div(
+        # Page layout container
+        tags.div(
+            [
+                # Left side: Predictions & blog
+                tags.div(
+                    [
+                        tags.div(
+                            [
+                                tags.h2("Predictions For Round 9", style="text-align: center; font-size: 32px; margin: 0; padding-top: 8.5px"),
+                                pred_table
+                            ],
+                            class_="prediction-box"
+                        ),
+                        tags.a(
+                            tags.div(
+                                [
+                                    tags.h3(
+                                        blog_post_name,
+                                        style="text-align: left; font-size: 24px; margin: 0; color: #000000; font-style: normal;"
+                                    ),
+                                    tags.p(
+                                        snippet,
+                                        style=(
+                                            "text-align: left; font-size: 14px; color: #777777; "
+                                            "margin-top: 8px; font-style: normal; font-family: 'PPFormula', sans-serif;"
+                                        )
+                                    )
+                                ],
+                                class_="blog-card",
+                                style=(
+                                    "background-color: #ffffff; padding: 20px; border-radius: 16px; "
+                                    "box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); font-style: normal;"
+                                )
+                            ),
+                            href=blog_post_url,
+                            style="display: block; text-decoration: none; color: inherit;"
+                        )
+
+                    ],
+                    class_="prediction-panel"
+                ),
+
+                # Right side: Ratings
+                tags.div(
+                    [
+                        tags.div(
+                            [
+                                tags.h2("Latest Ratings", style="text-align: center; font-size: 32px; margin: 0; padding-top: 8.5px"),
+                                rating_table
+                            ],
+                            class_="rating-box"
+                        )
+                    ],
+                    class_="rating-panel"
+                ),
+            ],
+            class_="main-container"
+        ),
+
+        # Embedded CSS
+        tags.style("""
+            .main-container {
+                display: flex;
+                width: 100%;
+                min-height: 100vh;
+                gap: 20px;
+                box-sizing: border-box;
+                padding: 20px;
+                align-items: flex-start;
+            }
+
+            .prediction-panel {
+                width: 66.67%;
+                display: flex;
+                flex-direction: column;
+                flex-shrink: 0;
+            }
+
+            .prediction-box {
+                background-color: #ffffff;
+                padding: 10px;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+                width: 100%;
+                overflow: visible;
+            }
+
+            .blog-links {
+                background-color: #f9f9f9;
+                padding: 10px;
+                border-radius: 12px;
+                text-align: center;
+                font-style: italic;
+                color: #666;
+                width: 100%;
+            }
+
+            .rating-panel {
+                width: 33.33%;
+                flex-shrink: 0;
+                padding-right: 20px;
+            }
+
+            .rating-box {
+                background-color: #ffffff;
+                padding: 10px;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                overflow: visible;
+            }
+
+            /* Table fixes to prevent inner scroll */
+            .reactable-table {
+                max-height: none !important;
+                overflow: visible !important;
+                display: block;
+                width: 100%;
+            }
+
+            .reactable-table tbody {
+                display: table-row-group !important;
+            }
+
+            .reactable-table thead,
+            .reactable-table tr,
+            .reactable-table td {
+                overflow: visible !important;
+                height: auto !important;
+            }
+
+            .reactable-table td {
+                white-space: nowrap;
+            }
+
+            @media (max-width: 768px) {
+                .main-container {
+                    flex-direction: column;
+                }
+                .prediction-panel,
+                .rating-panel {
+                    width: 100%;
+                    padding-right: 0px;
+                    
+                }
+            }
+        """)
+    )
+)
+```

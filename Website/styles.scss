@@ -1,0 +1,182 @@
+/*-- scss:defaults --*/
+
+//Colours//
+$green:#66a558;
+$gold: #ffd864;
+$red : #D14D41 ; 
+
+//Set BG Colour//
+html body {
+  background-color: #f5eedc;
+}
+
+.nav-footer {
+  background-color: #f5eedc !important;
+}
+//Navbar//
+$navbar-bg: $green ;
+$navbar-fg: $gold ;
+
+/* Make navbar a flexbox and center items */
+/* Define the default navbar background color */
+
+.navbar {
+padding: 10px 20px;
+}
+
+.navbar-brand img {
+max-height: 150px;
+}
+
+.navbar .nav-link {
+  font-size: 36px;
+}
+
+
+
+//Fonts//
+@font-face  {
+  font-family: 'Editorial New Regular';
+  src: local('Editorial New Regular'), url('static/Fonts/PPEditorialNew-Free for personal use/PPEditorialNew-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: optional;
+}
+@font-face {
+  font-family: 'PPFormula';
+  src: url('static/Fonts/PPFormula/PPFormulaMedium.otf') format('opentype');
+  font-weight: normal;
+} 
+@font-face {
+  font-family: 'PPFormula';
+  src: url('static/Fonts/PPFormula/PPFormulaSemiExtendedBold.otf') format('opentype');
+  font-weight: bold;
+} 
+
+//Index Panel Formatting//
+.main-container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    gap: 20px;
+    box-sizing: border-box;
+    padding: 20px;
+    align-items: flex-start;
+}
+
+.prediction-panel {
+    width: 66.67%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.prediction-box {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 100%;
+    overflow: visible;       /* Ensure no clipping */
+}
+
+.rating-box {
+  border: none !important;
+}
+
+.blog-links {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 12px;
+    text-align: center;
+    font-style: italic;
+    color: #666;
+    width: 100%;
+}
+
+.rating-panel {
+    width: 33.33%;
+    flex-shrink: 0;
+}
+
+.rating-box {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    overflow: visible;       /* No scrollbars */
+}
+
+/* Ensure Reactable tables expand fully and do not scroll */
+.reactable-table {
+    max-height: none !important;
+    overflow: visible !important;
+    display: block;
+    width: 100%;
+}
+
+.reactable-table tbody {
+    display: table-row-group !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+.reactable-table thead,
+.reactable-table tr,
+.reactable-table td {
+    overflow: visible !important;
+    height: auto !important;
+}
+
+/* Optional: prevent long columns from wrapping text */
+.reactable-table td {
+    white-space: nowrap;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+    .prediction-panel,
+    .rating-panel {
+        width: 100%;
+    }
+}
+
+.prediction-box h2,
+.rating-box h2 {
+    border-bottom: none;
+    box-shadow: none;
+    margin-bottom: 10px;
+    font-family: 'Editorial New Regular'
+}
+
+.prediction-box,
+.rating-box {
+  font-family: 'PPFormula';
+  font-size: 16px;
+  color: #222;
+
+  .reactable-table {
+    font-family: 'PPFormula';
+    font-size: 16px;
+
+    th {
+      font-weight: 600;
+    }
+
+    td {
+      font-weight: 400;
+    }
+  }
+  }
+
+.prediction-tbl td, .prediction-tbl th,
+.ladder-tbl td, .ladder-tbl th {
+  vertical-align: middle !important;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}

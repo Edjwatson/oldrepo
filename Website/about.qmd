@@ -1,0 +1,5 @@
+---
+title: "About"
+---
+
+I'm Edward Watson, a mathematics student at the ANU with a passion for modelling and statistics, and most importantly AFL. Holy Grail Ratings is a project of mine to model AFL margins, in my opinion Models are about expressing a well quantified opinion about what leads to margins, in my case I run an offensive and defensive ELO system based on scoring shots and expected score.

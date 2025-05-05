@@ -1,0 +1,12 @@
+title: "Welcome"
+date: "2025-04-30"
+categories: [Footy]
+description: "An introduction to the model"
+image: "Test.png"
+---
+
+![](Test.png)
+
+Welcome to Holy Grail Ratings. This is a project of mine to try and model AFL margins as best as possible. There's a long roadmap for this project which I'll discuss at the end of the post. But for now I think its best to explain how the model currently works and why I've made particular choices, and how to interpret the dashboards on the homepage.
+
+Welcome to Holy Grail Ratings!

@@ -1,0 +1,25 @@
+---
+title: "Blog"
+subtitle: "Tosser Talks Footy"
+listing:
+    id: listing
+    fields: [image,date,title, description]
+    sort: "date desc"
+    type: grid
+    categories: numbered
+    sort-ui: [date]
+page-layout: full
+date-format: medium
+author: ""
+date-modified: ""
+resources: /Users/edwardwatson/Documents/AFL Model/Website/assets/HGR.png
+---
+
+
+
+
+
+
+
+
+
